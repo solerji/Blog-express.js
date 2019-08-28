@@ -25,11 +25,11 @@ router.get('/api/article', (req, res) => {
         console.log('[SELECT ERROR] - ', err.message)
         return
       } else if (doc) {
-        console.log(doc)
-        if (doc.aid === req.body.aid) {
-          res.status(200).send(doc)
-        } else {
-          res.send('can not find it!')
+        for (var i = 0; i <= doc.length; i++) {
+          if (doc[i].aid == req.query.aid) {
+            res.status(200).send(doc[i])
+            break
+          }
         }
       } else {
         res.status(404).send(err.message)
@@ -39,15 +39,22 @@ router.get('/api/article', (req, res) => {
 })
 
 // 删除文章
-// router.delete('/api/article', (req, res) => {
-//   db.Article.remove({ aid: req.params.aid }, (err, data) => {
-//     if (err) {
-//       console.log(err)
-//     } else {
-//       res.status(200).send('succeed in deleting ---' + data)
-//     }
-//   })
-// })
+router.delete('/api/article', (req, res) => {
+  connection.query('DELETE FROM websites where aid = req.query.aid', function(
+    err,
+    doc
+  ) {
+    if (err) {
+      console.log('[SELECT ERROR] - ', err.message)
+      return
+    } else if (doc) {
+      console.log('删除成功')
+      res.status(200).send('删除成功')
+    } else {
+      res.status(404).send(err.message)
+    }
+  })
+})
 
 // // 修改文章（或者搞懂patch）
 // router.patch('/api/article', (req, res) => {
@@ -86,7 +93,7 @@ router.get('/api/articles', (req, res) => {
       //   res.send('no data!')
       // }
     } else {
-      res.send('no data!')
+      res.status(404).send('no data!')
       // res.send(err.message)
     }
   })
