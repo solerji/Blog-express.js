@@ -19,7 +19,7 @@ const connection = require('../db/mysqldb.js')
 // 获取某篇文章
 router.get('/api/article', (req, res) => {
   connection.query(
-    'SELECT aid, title, author, tags, createTime, content FROM article',
+    'SELECT aid, title, author, tags, createTime, updateTime, content FROM article',
     function(err, doc) {
       if (err) {
         console.log('[SELECT ERROR] - ', err.message)
@@ -40,20 +40,20 @@ router.get('/api/article', (req, res) => {
 
 // 删除文章
 router.delete('/api/article', (req, res) => {
-  connection.query('DELETE FROM websites where aid = req.query.aid', function(
-    err,
-    doc
-  ) {
-    if (err) {
-      console.log('[SELECT ERROR] - ', err.message)
-      return
-    } else if (doc) {
-      console.log('删除成功')
-      res.status(200).send('删除成功')
-    } else {
-      res.status(404).send(err.message)
+  connection.query(
+    "DELETE FROM article where article.aid = '${req.query.aid}'",
+    function(err, doc) {
+      if (err) {
+        console.log('[SELECT ERROR] - ', err.message)
+        return
+      } else if (doc) {
+        console.log(doc)
+        res.status(200).send('删除成功')
+      } else {
+        res.status(404).send(err.message)
+      }
     }
-  })
+  )
 })
 
 // // 修改文章（或者搞懂patch）
