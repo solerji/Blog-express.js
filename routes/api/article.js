@@ -5,7 +5,7 @@ const connection = require('../db/mysqldb.js')
 // 发布文章
 let addSql =
   'INSERT INTO article( title, author, tags, createTime, content) VALUES (?,?,?,?,?,?)'
-router.post('/api/article', (req, res) => {
+router.post('/api/addArticle', (req, res) => {
   let addSqlParams = [
     req.query.title,
     req.query.author,
