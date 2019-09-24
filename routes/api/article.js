@@ -4,22 +4,24 @@ const connection = require('../db/mysqldb.js')
 
 // 发布文章
 let addSql =
-  'INSERT INTO article( title, author, tags, createTime, content) VALUES (?,?,?,?,?,?)'
+  'INSERT INTO article(title, author, tags, createTime, content) VALUES (?,?,?,?,?)'
 router.post('/api/addArticle', (req, res) => {
   let addSqlParams = [
-    req.query.title,
-    req.query.author,
-    req.query.tags,
-    req.query.createTime,
-    req.query.content
+    req.body.title,
+    req.body.author,
+    req.body.tags,
+    req.body.createTime,
+    req.body.content
   ]
+  // console.log(3232, req.query)
   connection.query(addSql, addSqlParams, function(err, doc) {
     if (err) {
       console.log('[发布失败！] - ', err.message)
       return
     } else if (doc) {
-      console.log('发布成功 ID：', doc.aid)
+      // console.log('发布成功 ID：', doc.aid)
       console.log('发布成功：', doc)
+      res.status(200).send('发布成功')
     } else {
       res.status(404).send(err.message)
     }
@@ -96,15 +98,35 @@ router.delete('/api/delArticle', (req, res, next) => {
 
 let updateSql =
   'UPDATE article SET title = ?, author = ?, tags = ?, updateTime = ?, content = ?'
-// let updateSqlParams = [req.query.title,req.query.author,req.query.tags,req.query.updateTime,req.query.content]
+let checkSql = 'SELECT ? FROM article'
 // 更新文章
 router.post('/api/updateArticle', (req, res) => {
-  connection.query(updateSql, updateSqlParams, function(err, doc) {
+  let updateSqlParams = [
+    req.body.title,
+    req.body.author,
+    req.body.tags,
+    req.body.updateTime,
+    req.body.content
+  ]
+  let aid = req.body.aid
+  connection.query(checkSql, aid, function(err, doc) {
     if (err) {
-      console.log('[更新失败！] - ', err.message)
+      console.log('[SELECT ERROR] - ', err.message)
       return
     } else if (doc) {
-      console.log('更新成功 ID：', doc.aid)
+      console.log(212, doc)
+      connection.query(updateSql, updateSqlParams, function(err, doc) {
+        if (err) {
+          console.log('[更新失败！] - ', err.message)
+          return
+        } else if (doc) {
+          console.log('更新成功：', doc)
+          res.status(200).send('更新成功')
+          // console.log('更新成功 ID：', doc.aid)
+        } else {
+          res.status(404).send(err.message)
+        }
+      })
     } else {
       res.status(404).send(err.message)
     }
