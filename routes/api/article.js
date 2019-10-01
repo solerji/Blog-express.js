@@ -1,16 +1,19 @@
 const express = require('express')
 const router = express.Router()
 const connection = require('../db/mysqldb.js')
+const format = require('../../utils/dateutils.js')
 
 // 发布文章
 let addSql =
   'INSERT INTO article(title, author, tags, createTime, content, isPublish) VALUES (?,?,?,?,?,?)'
+let createTime = format(new Date())
+console.log(createTime)
 router.post('/api/addArticle', (req, res) => {
   let addSqlParams = [
     req.body.title,
     req.body.author,
     req.body.tags,
-    req.body.createTime,
+    createTime,
     req.body.content,
     req.body.publish
   ]
@@ -96,87 +99,58 @@ router.delete('/api/delArticle', (req, res, next) => {
 })
 
 let updateSql =
-  'UPDATE article SET title = ?, author = ?, tags = ?, updateTime = ?, content = ?'
-let checkSql =
-  'SELECT aid, title, author, tags, createTime, updateTime, content FROM article'
+  'UPDATE article SET title = ?, author = ?, tags = ?, updateTime = ?, content = ? WHERE aid = ?'
 // 更新文章
+let updateTime = format(new Date())
 router.post('/api/updateArticle', (req, res) => {
   let updateSqlParams = [
     req.body.title,
     req.body.author,
     req.body.tags,
-    req.body.createTime,
-    req.body.content
+    updateTime,
+    req.body.content,
+    req.body.aid
   ]
-  let userArticleAid = req.body.aid
-  connection.query(checkSql, function(err, doc) {
+  connection.query(updateSql, updateSqlParams, function(err, doc) {
     if (err) {
-      console.log('[SELECT ERROR] - ', err.message)
+      console.log('[更新失败！] - ', err.message)
       return
     } else if (doc) {
-      for (var i = 0; i <= doc.length; i++) {
-        console.log(doc[i].aid)
-        // if (doc[i].aid == userArticleAid) {
-
-        // }
-      }
-      // connection.query(updateSql, updateSqlParams, function(err, doc) {
-      //   if (err) {
-      //     console.log('[更新失败！] - ', err.message)
-      //     return
-      //   } else if (doc) {
-      //     if ((doc.aid = req.body.aid)) {
-      //     }
-      //     console.log('更新成功：', doc)
-      //     res.status(200).send('更新成功')
-      //   }
-      // })
-    } else {
-      res.status(404).send(err.message)
+      // console.log('更新成功：', doc)
+      res.status(200).send('更新成功')
     }
   })
 })
 
 // 搜索一些文章
-// router.get('/api/someArticles', (req, res) => {
-//   const key = req.query.payload.key
-//   const value = req.query.payload.value
-//   const page = req.query.payload.page || 1
-//   const skip = 4 * (page - 1)
-//   const re = new RegExp(value, 'i')
-//   if (key === 'tags') {
-//     // 根据标签来搜索文章
-//     const arr = value.split(' ')
-//     db.Article.find({ tags: { $all: arr } })
-//       .sort({ date: -1 })
-//       .limit(4)
-//       .skip(skip)
-//       .exec()
-//       .then(articles => {
-//         res.send(articles)
-//       })
-//   } else if (key === 'title') {
-//     // 根据标题的部分内容来搜索文章
-//     db.Article.find({ title: re, isPublish: true })
-//       .sort({ date: -1 })
-//       .limit(4)
-//       .skip(skip)
-//       .exec()
-//       .then(articles => {
-//         res.send(articles)
-//       })
-//   } else if (key === 'date') {
-//     // 根据日期来搜索文章
-//     const nextDay = value + 'T24:00:00'
-//     db.Article.find({ date: { $gte: new Date(value), $lt: new Date(nextDay) } })
-//       .sort({ date: -1 })
-//       .limit(4)
-//       .skip(skip)
-//       .exec()
-//       .then(articles => {
-//         res.send(articles)
-//       })
-//   }
-// })
+router.get('/api/someArticles', (req, res) => {
+  const key = req.query.key
+  const searchContent = req.query.value
+  // const page = req.query.payload.page || 1
+  // const skip = 4 * (page - 1)
+  // const re = new RegExp(value, 'i')
+  if (key === 'tags') {
+    // 根据标签来搜索文章
+    // const arr = value.split(' ')
+    // db.Article.find({ tags: { $all: arr } })
+    //   .sort({ date: -1 })
+    //   .limit(4)
+    //   .skip(skip)
+    //   .exec()
+    //   .then(articles => {
+    //     res.send(articles)
+    //   })
+  } else if (key === 'title') {
+    // 根据标题的部分内容来搜索文章
+    db.Article.find({ title: re, isPublish: true })
+      .sort({ date: -1 })
+      .limit(4)
+      .skip(skip)
+      .exec()
+      .then(articles => {
+        res.send(articles)
+      })
+  }
+})
 
 module.exports = router

@@ -4,7 +4,9 @@ var connection = mysql.createConnection({
   user: 'root',
   password: 'solerji',
   port: '3306',
-  database: 'my-blog'
+  database: 'my-blog',
+  // 强制时间类型输出，否则显示的时间会有时区问题
+  dateStrings: true
 })
 
 connection.connect(function(err) {
