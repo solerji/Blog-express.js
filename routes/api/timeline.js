@@ -5,11 +5,10 @@ const connection = require('../db/mysqldb.js')
 // 获取时间轴时间和标题
 router.get('/api/timeline', (req, res) => {
   connection.query(
-    'SELECT aid, createTime, updateTime, title FROM article ORDER BY updateTime DESC',
+    'SELECT aid, update_time, title FROM article ORDER BY update_time DESC',
     function(err, timeline) {
       if (err) {
         console.log('[SELECT ERROR] - ', err.message)
-        return
       } else if (timeline) {
         timeline.forEach(item => {
           var showTime = item.updateTime
