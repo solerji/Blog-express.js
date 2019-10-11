@@ -61,7 +61,7 @@ router.get('/api/articles', (req, res) => {
       console.log('[SELECT ERROR] - ', err.message)
       return
     } else if (article) {
-      console.log(article)
+      // console.log(article)
       res.status(200).send({
         list: article
       })
@@ -92,18 +92,38 @@ router.get('/api/article', (req, res) => {
 })
 
 // 删除文章
-router.delete('/api/delArticle', (req, res, next) => {
-  console.log(req)
-  var aid = req.body.aid
-  connection.query('DELETE FROM article where aid = ?', aid, function(
-    err,
-    doc
-  ) {
+router.delete('/api/delArticle', (req, res) => {
+  articleService.getArticleById(req.body.aid, function(err, articles) {
     if (err) {
-      console.log('[删除失败！] - ', err.message)
-      return
-    } else if (doc) {
-      res.status(200).send('删除成功')
+      console.log('[查询失败！] - ', err.message)
+    } else if (articles) {
+      console.log('[查询成功！]')
+      tagService.getTagsByTitle(articles[0].title, function(err, tags) {
+        if (err) {
+          console.log('[查询失败！] - ', err.message)
+        } else if (tags) {
+          tagService.removeTag(tags, function(err, tags) {
+            if (err) {
+              console.log('[删除标签失败！] - ', err.message)
+            } else if (tags) {
+              console.log('[删除标签成功！]')
+              articleService.delArticleById(req.body.aid, function(
+                err,
+                article
+              ) {
+                if (err) {
+                  console.log('[删除失败！] - ', err.message)
+                  return
+                } else if (article) {
+                  res.status(200).send('删除成功')
+                } else {
+                  res.status(404).send(err.message)
+                }
+              })
+            }
+          })
+        }
+      })
     } else {
       res.status(404).send(err.message)
     }
@@ -122,22 +142,20 @@ router.post('/api/updateArticle', (req, res) => {
     if (err) {
       console.log('[查询失败！] - ', err.message)
     } else if (tags) {
-      console.log(12121, req.body.tagName)
+      // console.log(12121, req.body.tagName)
       tags.forEach(item => {
         req.body.tagName.forEach(tagName => {
           // console.log(333, item.tag_name)
           // console.log(222, tagName.tag_name)
           if (tagName.tag_name !== item.tag_name) {
-            // tagService.addTag([req.body.title, tagName.tag_name], function(
-            //   err,
-            //   tags
-            // ) {
-            //   if (err) {
-            //     console.log('[添加标签失败！] - ', err.message)
-            //   } else if (tags) {
-            //     console.log('[添加标签成功！] - ', tags)
-            //   }
-            // })
+            tagService.addTag(req.body, function(err, tags) {
+              if (err) {
+                console.log('[插入标签失败！] - ', err.message)
+              } else if (tags) {
+                console.log('[插入标签成功！]')
+                res.status(200).send('插入成功!')
+              }
+            })
           }
           if (item.tag_name !== tagName.tag_name) {
             // tagService.removeTag([req.body.title, tagName.tag_name], function(

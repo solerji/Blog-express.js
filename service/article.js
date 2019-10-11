@@ -18,3 +18,8 @@ module.exports.addArticle = function(article, callback) {
   let params = [article.title, article.author, article.content]
   connection.query(addSql, params, callback)
 }
+
+module.exports.delArticleById = function(aid, callback) {
+  let delSql = 'DELETE FROM article where aid = ?'
+  connection.query(delSql, aid, callback)
+}

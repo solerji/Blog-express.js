@@ -3,14 +3,17 @@ const connection = require('../routes/db/mysqldb.js')
 module.exports.getTagsByTitle = function(title, callback) {
   let sql =
     'SELECT tag_name, article_title FROM article_tag WHERE article_title = ?'
-  // console.log(title)
   connection.query(sql, [title], callback)
 }
 
-module.exports.removeTag = function(title, tagName, callback) {
+module.exports.removeTag = function(tag, callback) {
   let deleteTagSql =
-    'DELETE article_tag WHERE article_title = ? AND tag_name = ?'
-  connection.query(deleteTagSql, [title, tagName], callback)
+    'DELETE FROM article_tag WHERE article_title = ? AND tag_name = ?'
+  tag.forEach(item => {
+    let params = [item.article_title, item.tag_name]
+    console.log(1212, params)
+    connection.query(deleteTagSql, params, callback)
+  })
 }
 
 module.exports.addTag = function(tags, callback) {
