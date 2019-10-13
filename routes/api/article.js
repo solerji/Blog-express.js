@@ -3,7 +3,6 @@ const tagService = require('../../service/tag.js')
 
 const express = require('express')
 const router = express.Router()
-const connection = require('../db/mysqldb.js')
 // const format = require('../../utils/dateutils.js')
 
 // 发布文章
@@ -13,61 +12,34 @@ router.post('/api/addArticle', (req, res) => {
       console.log('[插入失败！] - ', err.message)
     } else if (article) {
       console.log('[插入成功！]')
+      res.status(200).send('插入成功!', { code: 0 })
       tagService.addTag(req.body, function(err, tags) {
         if (err) {
           console.log('[插入标签失败！] - ', err.message)
         } else if (tags) {
           console.log('[插入标签成功！]')
-          res.status(200).send('插入成功!')
+          res.status(200).send('插入成功!', { code: 0 })
         }
       })
     } else {
       res.status(404).send(err.message)
     }
   })
-  // let addSqlParams = [req.body.title, req.body.author, req.body.content]
-  // connection.query(addSql, addSqlParams, function(err, doc) {
-  //   if (err) {
-  //     console.log('[发布文章失败！] - ', err.message)
-  //     return
-  //   } else if (doc) {
-  //     req.body.tagName.forEach(item => {
-  //       let addOneTag = [item, req.body.title]
-  //       connection.query(addTagsSql, addOneTag, function(err, tag) {
-  //         if (err) {
-  //           console.log('[插入标签失败！] - ', err.message)
-  //           return
-  //         } else if (tag) {
-  //           console.log('[发布成功！] - ', addOneTag)
-  //         } else {
-  //           res.status(404).send(err.message)
-  //         }
-  //       })
-  //     })
-  //     res.status(200).send('发布成功')
-  //   } else {
-  //     res.status(404).send(err.message)
-  //   }
-  // })
 })
 
 // 获取文章列表
 router.get('/api/articles', (req, res) => {
-  connection.query('SELECT aid, title, content FROM article', function(
-    err,
-    article
-  ) {
+  articleService.getArticleList(req, function(err, article) {
     if (err) {
       console.log('[SELECT ERROR] - ', err.message)
       return
     } else if (article) {
-      // console.log(article)
       res.status(200).send({
+        code: 0,
         list: article
       })
     } else {
       res.status(404).send('no data!')
-      // res.send(err.message)
     }
   })
 })
@@ -81,6 +53,7 @@ router.get('/api/article', (req, res) => {
       console.log('[查询成功！]')
       tagService.getTagsByTitle(articles[0].title, function(err, tags) {
         res.status(200).send({
+          code: 0,
           article: articles[0],
           tags: tags
         })
@@ -98,6 +71,7 @@ router.delete('/api/delArticle', (req, res) => {
       console.log('[查询失败！] - ', err.message)
     } else if (articles) {
       console.log('[查询成功！]')
+      res.status(200).send('查询成功!', { code: 0 })
       tagService.getTagsByTitle(articles[0].title, function(err, tags) {
         if (err) {
           console.log('[查询失败！] - ', err.message)
@@ -115,7 +89,9 @@ router.delete('/api/delArticle', (req, res) => {
                   console.log('[删除失败！] - ', err.message)
                   return
                 } else if (article) {
-                  res.status(200).send('删除成功')
+                  res.status(200).send('删除成功', {
+                    code: 0
+                  })
                 } else {
                   res.status(404).send(err.message)
                 }
@@ -153,7 +129,9 @@ router.post('/api/updateArticle', (req, res) => {
                 console.log('[插入标签失败！] - ', err.message)
               } else if (tags) {
                 console.log('[插入标签成功！]')
-                res.status(200).send('插入成功!')
+                res.status(200).send('插入成功!', {
+                  code: 0
+                })
               }
             })
           }
@@ -215,35 +193,22 @@ router.post('/api/updateArticle', (req, res) => {
   // })
 })
 
-// 搜索一些文章
+// 按照标题搜索文章
 router.get('/api/someArticles', (req, res) => {
-  const key = req.query.key
-  const searchContent = req.query.value
-  // const page = req.query.payload.page || 1
-  // const skip = 4 * (page - 1)
-  // const re = new RegExp(value, 'i')
-  if (key === 'tags') {
-    // 根据标签来搜索文章
-    // const arr = value.split(' ')
-    // db.Article.find({ tags: { $all: arr } })
-    //   .sort({ date: -1 })
-    //   .limit(4)
-    //   .skip(skip)
-    //   .exec()
-    //   .then(articles => {
-    //     res.send(articles)
-    //   })
-  } else if (key === 'title') {
-    // 根据标题的部分内容来搜索文章
-    db.Article.find({ title: re, isPublish: true })
-      .sort({ date: -1 })
-      .limit(4)
-      .skip(skip)
-      .exec()
-      .then(articles => {
-        res.send(articles)
+  console.log(req.query.key)
+  articleService.searchArticleByTitle(req.query.key, function(err, result) {
+    if (err) {
+      console.log('[搜索失败！] - ', err.message)
+      return
+    } else if (result) {
+      res.status(200).send({
+        code: 0,
+        list: result
       })
-  }
+    } else {
+      res.status(404).send(err.message)
+    }
+  })
 })
 
 module.exports = router

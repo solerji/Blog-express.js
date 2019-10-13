@@ -24,3 +24,14 @@ module.exports.addTag = function(tags, callback) {
     connection.query(addTagSql, params, callback)
   })
 }
+
+module.exports.getTagList = function(req, callback) {
+  let sql = 'SELECT DISTINCT tag_name FROM article_tag'
+  connection.query(sql, callback)
+}
+
+module.exports.getTagTimeLine = function(tag, callback) {
+  let sql =
+    'SELECT tag_name, article_title, update_time FROM article_tag WHERE tag_name = ?'
+  connection.query(sql, tag, callback)
+}

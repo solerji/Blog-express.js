@@ -6,6 +6,11 @@ module.exports.getArticleById = function(aid, callback) {
   connection.query(sql, aid, callback)
 }
 
+module.exports.getArticleList = function(req, callback) {
+  let sql = 'SELECT aid, title, content FROM article'
+  connection.query(sql, callback)
+}
+
 module.exports.updateArticleById = function(article, callback) {
   let sql =
     'UPDATE article SET title = ?, author = ?, content = ? WHERE aid = ?'
@@ -22,4 +27,10 @@ module.exports.addArticle = function(article, callback) {
 module.exports.delArticleById = function(aid, callback) {
   let delSql = 'DELETE FROM article where aid = ?'
   connection.query(delSql, aid, callback)
+}
+
+module.exports.searchArticleByTitle = function(title, callback) {
+  let sql = 'SELECT * FROM article WHERE title LIKE ? '
+  let newTitle = '%' + title + '%'
+  connection.query(sql, newTitle, callback)
 }
