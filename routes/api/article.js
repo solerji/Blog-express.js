@@ -6,25 +6,21 @@ const router = express.Router()
 // const format = require('../../utils/dateutils.js')
 
 // 发布文章
-router.post('/api/addArticle', (req, res) => {
-  articleService.addArticle(req.body, function(err, article) {
-    if (err) {
-      console.log('[插入失败！] - ', err.message)
-    } else if (article) {
-      console.log('[插入成功！]')
-      res.status(200).send('插入成功!', { code: 0 })
-      tagService.addTag(req.body, function(err, tags) {
-        if (err) {
-          console.log('[插入标签失败！] - ', err.message)
-        } else if (tags) {
-          console.log('[插入标签成功！]')
-          res.status(200).send('插入成功!', { code: 0 })
-        }
-      })
-    } else {
-      res.status(404).send(err.message)
-    }
-  })
+router.post('/api/addArticle', async (req, res) => {
+  let rows = await articleService.addArticle(req.body)
+  if (rows) {
+    console.log(rows)
+    console.log('[插入成功！]')
+    res.status(200).send('插入成功!', { code: 0 })
+    tagService.addTag(req.body, function(err, tags) {
+      if (err) {
+        console.log('[插入标签失败！] - ', err.message)
+      } else if (tags) {
+        console.log('[插入标签成功！]')
+        res.status(200).send('插入成功!', { code: 0 })
+      }
+    })
+  }
 })
 
 // 获取文章列表
@@ -45,23 +41,18 @@ router.get('/api/articles', (req, res) => {
 })
 
 // 获取某篇文章
-router.get('/api/article', (req, res) => {
-  articleService.getArticleById(req.query.aid, function(err, articles) {
-    if (err) {
-      console.log('[查询失败！] - ', err.message)
-    } else if (articles) {
-      console.log('[查询成功！]')
-      tagService.getTagsByTitle(articles[0].title, function(err, tags) {
-        res.status(200).send({
-          code: 0,
-          article: articles[0],
-          tags: tags
-        })
+router.get('/api/article', async (req, res) => {
+  let rows = await articleService.getArticleById(req.query.aid)
+  if (rows) {
+    console.log('[查询成功！]')
+    tagService.getTagsByTitle(rows[0].title, function(err, tags) {
+      res.status(200).send({
+        code: 0,
+        article: rows[0],
+        tags: tags
       })
-    } else {
-      res.status(404).send(err.message)
-    }
-  })
+    })
+  }
 })
 
 // 删除文章

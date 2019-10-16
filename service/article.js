@@ -5,6 +5,19 @@ module.exports.getArticleById = function(aid, callback) {
     'SELECT aid, title, author, update_time, content FROM article WHERE aid = ?'
   connection.query(sql, aid, callback)
 }
+module.exports.getArticleById = function(aid) {
+  let sql =
+    'SELECT aid, title, author, update_time, content FROM article WHERE aid = ?'
+  return new Promise((resolve, reject) => {
+    connection.query(sql, aid, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
+}
 
 module.exports.getArticleList = function(req, callback) {
   let sql = 'SELECT aid, title, content FROM article'
@@ -18,10 +31,18 @@ module.exports.updateArticleById = function(article, callback) {
   connection.query(sql, params, callback)
 }
 
-module.exports.addArticle = function(article, callback) {
+module.exports.addArticle = function(article) {
   let addSql = 'INSERT INTO article(title, author, content) VALUES (?,?,?)'
   let params = [article.title, article.author, article.content]
-  connection.query(addSql, params, callback)
+  return new Promise((resolve, reject) => {
+    connection.query(addSql, params, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
 
 module.exports.delArticleById = function(aid, callback) {
