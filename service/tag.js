@@ -3,24 +3,34 @@ const connection = require('../routes/db/mysqldb.js')
 module.exports.getTagsByTitle = function(title, callback) {
   let sql =
     'SELECT tag_name, article_title FROM article_tag WHERE article_title = ?'
-  connection.query(sql, [title], callback)
+  // connection.query(sql, [title], callback)
+  return new Promise((resolve, reject) => {
+    connection.query(sql, [title], (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
 
 module.exports.removeTag = function(tag, callback) {
-  let deleteTagSql =
-    'DELETE FROM article_tag WHERE article_title = ? AND tag_name = ?'
-  tag.forEach(item => {
-    let params = [item.article_title, item.tag_name]
-    console.log(1212, params)
-    connection.query(deleteTagSql, params, callback)
-  })
+  let deleteTagSql = 'DELETE FROM article_tag WHERE article_title = ? '
+  //  'DELETE FROM article_tag WHERE article_title = ? AND tag_name = ?'
+  // if (tag.length > 0) {
+  // tag.forEach(item => {
+  // let params = [item.article_title, item.tag_name]
+  connection.query(deleteTagSql, tag, callback)
+  // })
+  // }
 }
 
 module.exports.addTag = function(tags, callback) {
   let addTagSql =
     'INSERT INTO article_tag(tag_name, article_title) VALUES (?,?)'
   tags.tagName.forEach(item => {
-    let params = [item.tag_name, item.article_title]
+    let params = [item, tags.title]
     connection.query(addTagSql, params, callback)
   })
 }

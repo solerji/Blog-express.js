@@ -1,10 +1,5 @@
 const connection = require('../routes/db/mysqldb.js')
 
-module.exports.getArticleById = function(aid, callback) {
-  let sql =
-    'SELECT aid, title, author, update_time, content FROM article WHERE aid = ?'
-  connection.query(sql, aid, callback)
-}
 module.exports.getArticleById = function(aid) {
   let sql =
     'SELECT aid, title, author, update_time, content FROM article WHERE aid = ?'
