@@ -20,6 +20,7 @@ module.exports.getArticleList = function(req, callback) {
 }
 
 module.exports.updateArticleById = function(article, callback) {
+  console.log(111, article)
   let sql =
     'UPDATE article SET title = ?, author = ?, content = ? WHERE aid = ?'
   let params = [article.title, article.author, article.content, article.aid]

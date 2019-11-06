@@ -118,45 +118,33 @@ router.delete('/api/delArticle', async (req, res) => {
 
 // 更新文章
 router.post('/api/updateArticle', async (req, res) => {
-  // let updateSqlParams = [
-  //   req.body.title,
-  //   req.body.author,
-  //   req.body.content,
-  //   req.body.aid
-  // ]
+  console.log(999, req.body)
   let rows = await tagService.getTagsByTitle(req.body.title)
-  console.log(12121, req.body.tagName)
   if (rows) {
-  }
-  tags.forEach(item => {
-    req.body.tagName.forEach(tagName => {
-      console.log(222, tagName)
-      if (tagName !== item.tag_name) {
+    console.log('[查询标签成功！]')
+    var tagtiltle = req.body.title
+    tagService.removeTag(req.body.title, function(err, tagtiltle) {
+      if (err) {
+        console.log('[删除标签失败！] - ', err.message)
+      } else if (tagtiltle) {
+        console.log('[删除标签成功！]')
         tagService.addTag(req.body, function(err, tags) {
           if (err) {
             console.log('[插入标签失败！] - ', err.message)
           } else if (tags) {
             console.log('[插入标签成功！]')
-            res.status(200).send('插入成功!', {
-              code: 0
+            articleService.updateArticleById(req.body, function(err, article) {
+              if (err) {
+                console.log('[更新文章失败！] - ', err.message)
+              } else if (article) {
+                console.log('[更新文章成功！] ')
+              }
             })
           }
         })
       }
-      if (item.tag_name !== tagName.tag_name) {
-        // tagService.removeTag([req.body.title, tagName.tag_name], function(
-        //   err,
-        //   tags
-        // ) {
-        //   if (err) {
-        //     console.log('[删除标签失败！] - ', err.message)
-        //   } else if (tags) {
-        //     console.log('[删除标签成功！] - ', tags)
-        //   }
-        // })
-      }
     })
-  })
+  }
 })
 // tagService.removeTag([req.body.title, req.body.tagName], function(
 //   err,
