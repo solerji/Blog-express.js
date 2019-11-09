@@ -2,7 +2,7 @@ const connection = require('../routes/db/mysqldb.js')
 
 module.exports.getArticleById = function(aid) {
   let sql =
-    'SELECT aid, title, author, update_time, content FROM article WHERE aid = ?'
+    'SELECT aid, title, author, update_time, content, show_content FROM article WHERE aid = ?'
   return new Promise((resolve, reject) => {
     connection.query(sql, aid, (err, rows) => {
       if (err) {
@@ -14,22 +14,50 @@ module.exports.getArticleById = function(aid) {
   })
 }
 
-module.exports.getArticleList = function(req, callback) {
-  let sql = 'SELECT aid, title, content FROM article'
-  connection.query(sql, callback)
+module.exports.getArticleList = function() {
+  let sql = 'SELECT aid, title, show_content FROM article'
+  return new Promise((resolve, reject) => {
+    connection.query(sql, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
 
-module.exports.updateArticleById = function(article, callback) {
-  console.log(111, article)
+module.exports.updateArticleById = function(article) {
   let sql =
-    'UPDATE article SET title = ?, author = ?, content = ? WHERE aid = ?'
-  let params = [article.title, article.author, article.content, article.aid]
-  connection.query(sql, params, callback)
+    'UPDATE article SET title = ?, author = ?, content = ? , show_content= ? WHERE aid = ?'
+  let params = [
+    article.title,
+    article.author,
+    article.content,
+    article.showContent,
+    article.aid
+  ]
+  // connection.query(sql, params, callback)
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
 
 module.exports.addArticle = function(article) {
-  let addSql = 'INSERT INTO article(title, author, content) VALUES (?,?,?)'
-  let params = [article.title, article.author, article.content]
+  let addSql =
+    'INSERT INTO article(title, author, content, show_content) VALUES (?,?,?,?)'
+  let params = [
+    article.title,
+    article.author,
+    article.content,
+    article.showContent
+  ]
   return new Promise((resolve, reject) => {
     connection.query(addSql, params, (err, rows) => {
       if (err) {
@@ -41,13 +69,29 @@ module.exports.addArticle = function(article) {
   })
 }
 
-module.exports.delArticleById = function(aid, callback) {
+module.exports.delArticleById = function(aid) {
   let delSql = 'DELETE FROM article where aid = ?'
-  connection.query(delSql, aid, callback)
+  return new Promise((resolve, reject) => {
+    connection.query(delSql, aid, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
 
-module.exports.searchArticleByTitle = function(title, callback) {
+module.exports.searchArticleByTitle = function(title) {
   let sql = 'SELECT * FROM article WHERE title LIKE ? '
   let newTitle = '%' + title + '%'
-  connection.query(sql, newTitle, callback)
+  return new Promise((resolve, reject) => {
+    connection.query(sql, newTitle, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
 }
