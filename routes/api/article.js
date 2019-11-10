@@ -5,6 +5,20 @@ const express = require('express')
 const router = express.Router()
 // const format = require('../../utils/dateutils.js')
 
+// 获取文章分页数据
+router.post('/api/getPage', async (req, res) => {
+  console.log('dffdfd', req.body)
+  let result = await articleService.getArticlePage(req.body)
+  if (result) {
+    res.status(200).send({
+      code: 0,
+      list: result
+    })
+  } else {
+    res.status(500).send('服务器端错误!', err.message)
+  }
+})
+
 // 发布文章
 router.post('/api/addArticle', async (req, res) => {
   let rows = await articleService.addArticle(req.body)
@@ -29,7 +43,7 @@ router.get('/api/articles', async (req, res) => {
       list: result
     })
   } else {
-    res.status(404).send('no data!')
+    res.status(500).send('服务器端错误!', err.message)
   }
 })
 
@@ -47,7 +61,7 @@ router.get('/api/article', async (req, res) => {
       })
     }
   } else {
-    res.status(404).send('no data!')
+    res.status(500).send('服务器端错误!', err.message)
   }
 })
 
@@ -120,7 +134,6 @@ router.post('/api/updateArticle', async (req, res) => {
       console.log('[删除标签成功！]')
       let addIt = await tagService.addTag(req.body)
       if (addIt) {
-        console.log(222)
         console.log('[插入标签成功！]')
         let update = await articleService.updateArticleById(req.body)
         if (update) {

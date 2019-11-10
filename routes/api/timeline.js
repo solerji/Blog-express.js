@@ -15,6 +15,4 @@ router.get('/api/timeline', async (req, res) => {
   }
 })
 
-// 根据标签获取时间轴
-
 module.exports = router

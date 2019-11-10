@@ -95,3 +95,19 @@ module.exports.searchArticleByTitle = function(title) {
     })
   })
 }
+
+module.exports.getArticlePage = function(page) {
+  console.log(111, page.currentPage)
+  let sql = 'SELECT aid, title, show_content FROM article LIMIT ? , ? '
+  // let countSql = 'SELECT count(aid) FROM article'
+  let show = [(page.currentPage - 1) * page.pageIndex, page.pageIndex]
+  return new Promise((resolve, reject) => {
+    connection.query(sql, show, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+      }
+    })
+  })
+}
