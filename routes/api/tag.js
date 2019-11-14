@@ -31,13 +31,16 @@ router.get('/api/tags', async (req, res) => {
 
 // 获取时间轴列表
 router.post('/api/getTimeLine', async (req, res) => {
-  console.log('dffdfd', req.body)
   let result = await tagService.getTimeLineList(req.body)
   if (result) {
-    res.status(200).send({
-      code: 0,
-      list: result
-    })
+    let count = await tagService.getTagCount(req.body)
+    if (count) {
+      res.status(200).send({
+        code: 0,
+        list: result,
+        count: count
+      })
+    }
   } else {
     res.status(500).send('服务器端错误!', err.message)
   }

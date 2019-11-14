@@ -76,7 +76,7 @@ module.exports.getTagTimeLine = function(tag) {
 module.exports.getTimeLineList = function(page) {
   let sql =
     'SELECT tag_name, article_title, update_time FROM article_tag WHERE tag_name = ? LIMIT ? , ? '
-  let countSql = 'SELECT count(article_title) FROM article_tag'
+  // let countSql = 'SELECT count(article_title) FROM article_tag'
   let show = [
     page.tagName,
     (page.currentPage - 1) * page.pageIndex,
@@ -88,6 +88,22 @@ module.exports.getTimeLineList = function(page) {
         reject(err)
       } else {
         resolve(rows)
+      }
+    })
+  })
+}
+
+module.exports.getTagCount = function(name) {
+  let tagName = name.tagName
+  let countSql =
+    'SELECT count(article_title) as count FROM article_tag WHERE tag_name = ?'
+  return new Promise((resolve, reject) => {
+    connection.query(countSql, tagName, (err, rows) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(rows)
+        console.log(7777, rows)
       }
     })
   })

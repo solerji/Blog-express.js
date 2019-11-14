@@ -7,13 +7,17 @@ const router = express.Router()
 
 // 获取文章分页数据
 router.post('/api/getPage', async (req, res) => {
-  console.log('dffdfd', req.body)
   let result = await articleService.getArticlePage(req.body)
   if (result) {
-    res.status(200).send({
-      code: 0,
-      list: result
-    })
+    let count = await articleService.getCount()
+    if (count) {
+      console.log(count)
+      res.status(200).send({
+        code: 0,
+        list: result,
+        count: count
+      })
+    }
   } else {
     res.status(500).send('服务器端错误!', err.message)
   }
