@@ -27,9 +27,16 @@ router.post('/api/getPage', async (req, res) => {
 router.post('/api/addArticle', async (req, res) => {
   let rows = await articleService.addArticle(req.body)
   if (rows) {
-    let addSuccess = await tagService.addTag(req.body)
-    console.log(444, addSuccess)
-    if (addSuccess) {
+    var tagItem = req.body.tagName
+    var item = ''
+    for (var i = 0; i <= tagItem.length; i++) {
+      item = tagItem[i]
+      var params = [item, req.body.title]
+      if (params[0] !== undefined) {
+        var message = await tagService.addTag(params)
+      }
+    }
+    if (message) {
       console.log('[插入标签成功！]')
       res.status(200).send({
         code: '0'
@@ -136,7 +143,15 @@ router.post('/api/updateArticle', async (req, res) => {
     let remove = await tagService.removeTag(req.body.title)
     if (remove) {
       console.log('[删除标签成功！]')
-      let addIt = await tagService.addTag(req.body)
+      var tagItem = req.body.tagName
+      var item = ''
+      for (var i = 0; i <= tagItem.length; i++) {
+        item = tagItem[i]
+        var params = [item, req.body.title]
+        if (params[0] !== undefined) {
+          var addIt = await tagService.addTag(params)
+        }
+      }
       if (addIt) {
         console.log('[插入标签成功！]')
         let update = await articleService.updateArticleById(req.body)
