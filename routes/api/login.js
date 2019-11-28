@@ -18,7 +18,7 @@ const router = express.Router()
 router.post('/api/login', (req, res) => {
   loginService.login(req, function(err, result) {
     if (err) {
-      console.log('[SELECT ERROR] - ', err.message)
+      // console.log('[SELECT ERROR] - ', err.message)
       return
     } else if (result) {
       if (result[0].password === req.body.password) {
@@ -40,30 +40,5 @@ router.post('/api/login', (req, res) => {
     }
   })
 })
-
-// 第一版直接请求
-// connection.query('SELECT name,password,id FROM user', function(err, result) {
-//   if (err) {
-//     console.log('[SELECT ERROR] - ', err.message)
-//     return
-//   } else if (result) {
-//     if (result[0].password === req.body.password) {
-//       // const token = creatToken(doc._id, doc.name)
-//       res.status(200).send({
-//         name: result[0].name,
-//         id: result[0].id
-//       })
-//       // res.status(200).send({
-//       //   id: result._id,
-//       //   name: result.name
-//       //   // token: token
-//       // })
-//     } else {
-//       res.send('error password')
-//     }
-//   } else {
-//     res.status(401).end()
-//   }
-// })
 
 module.exports = router
