@@ -97,7 +97,7 @@ module.exports.searchArticleByTitle = function(title) {
 }
 
 module.exports.getArticlePage = function(page) {
-  let sql = 'SELECT aid, title, show_content FROM article LIMIT ? , ? '
+  let sql = 'SELECT aid, title, show_content, content FROM article LIMIT ? , ? '
   let show = [(page.currentPage - 1) * page.pageIndex, page.pageIndex]
   return new Promise((resolve, reject) => {
     connection.query(sql, show, (err, rows) => {

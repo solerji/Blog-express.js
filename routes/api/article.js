@@ -9,21 +9,23 @@ const router = express.Router()
 // 获取文章分页数据
 router.post('/api/getPage', async (req, res) => {
   try {
-    let result = await articleService.getArticlePage(req.body)
-    try {
-      let count = await articleService.getCount()
-      // logger.info(count)
-      res.status(200).send({
-        code: 0,
-        list: result,
-        count: count
-      })
-    } catch (err) {
-      res.status(500).send('服务器端错误!', err.message)
-      // console.log(err)
-    }
+    var result = await articleService.getArticlePage(req.body)
   } catch (err) {
     res.status(500).send('服务器端错误!', err.message)
+    return
+    // console.log(err)
+  }
+  try {
+    let count = await articleService.getCount()
+    // logger.info(count)
+    res.status(200).send({
+      code: 0,
+      list: result,
+      count: count
+    })
+  } catch (err) {
+    res.status(500).send('服务器端错误!', err.message)
+    return
     // console.log(err)
   }
 })
@@ -32,33 +34,30 @@ router.post('/api/getPage', async (req, res) => {
 router.post('/api/addArticle', async (req, res) => {
   try {
     await articleService.addArticle(req.body)
-    try {
-      var tagItem = req.body.tagName
-      var item = ''
-      for (var i = 0; i <= tagItem.length; i++) {
-        item = tagItem[i]
-        var params = [item, req.body.title]
-        if (params[0] !== undefined) {
-          try {
-            await tagService.addTag(params)
-            // console.log('[插入标签成功！]')
-            res.status(200).send({
-              code: '0'
-            })
-          } catch (err) {
-            // console.log(err)
-            res.status(500).send('服务器端错误!', err.message)
-          }
-        }
-      }
-    } catch (err) {
-      // console.log(err)
-      res.status(500).send('服务器端错误!', err.message)
-    }
   } catch (err) {
     // console.log(err)
     res.status(500).send('服务器端错误!', err.message)
+    return
   }
+  var tagItem = req.body.tagName
+  var item = ''
+  for (var i = 0; i <= tagItem.length; i++) {
+    item = tagItem[i]
+    var params = [item, req.body.title]
+    if (params[0] !== undefined) {
+      try {
+        await tagService.addTag(params)
+        // console.log('[插入标签成功！]')
+      } catch (err) {
+        // console.log(err)
+        res.status(500).send('服务器端错误!', err.message)
+        return
+      }
+    }
+  }
+  res.status(200).send({
+    code: '0'
+  })
 })
 
 // 获取文章列表
@@ -72,28 +71,31 @@ router.get('/api/articles', async (req, res) => {
   } catch (err) {
     // console.log(err)
     res.status(500).send('服务器端错误!', err.message)
+    return
   }
 })
 
 // 获取某篇文章
 router.get('/api/article', async (req, res) => {
   try {
-    let rows = await articleService.getArticleById(req.query.aid)
+    var rows = await articleService.getArticleById(req.query.aid)
     // console.log('[查询成功！]')
-    try {
-      let tags = await tagService.getTagsByTitle(rows[0].title)
-      res.status(200).send({
-        code: 0,
-        article: rows[0],
-        tags: tags
-      })
-    } catch (err) {
-      // console.log(err)
-      res.status(500).send('服务器端错误!', err.message)
-    }
   } catch (err) {
     // console.log(err)
     res.status(500).send('服务器端错误!', err.message)
+    return
+  }
+  try {
+    let tags = await tagService.getTagsByTitle(rows[0].title)
+    res.status(200).send({
+      code: 0,
+      article: rows[0],
+      tags: tags
+    })
+  } catch (err) {
+    // console.log(err)
+    res.status(500).send('服务器端错误!', err.message)
+    return
   }
 })
 
@@ -114,12 +116,15 @@ router.delete('/api/delArticle', async (req, res) => {
         })
       } catch (err) {
         res.status(500).send('服务器端错误!', err.message)
+        return
       }
     } catch (err) {
       res.status(500).send('服务器端错误!', err.message)
+      return
     }
   } catch (err) {
     res.status(500).send('服务器端错误!', err.message)
+    return
   }
 })
 
@@ -128,39 +133,40 @@ router.post('/api/updateArticle', async (req, res) => {
   try {
     await tagService.getTagsByTitle(req.body.title)
     // console.log('[查询标签成功！]')
-    try {
-      await tagService.removeTag(req.body.title)
-      // console.log('[删除标签成功！]')
-      var tagItem = req.body.tagName
-      var item = ''
-      for (var i = 0; i <= tagItem.length; i++) {
-        item = tagItem[i]
-        var params = [item, req.body.title]
-        if (params[0] !== undefined) {
-          try {
-            var addIt = await tagService.addTag(params)
-          } catch (err) {
-            res.status(500).send('服务器端错误!', err.message)
-          }
-        }
-      }
-      if (addIt) {
-        // console.log('[插入标签成功！]')
-        try {
-          await articleService.updateArticleById(req.body)
-          // console.log('[更新文章成功！] ')
-          res.status(200).send({
-            code: '0'
-          })
-        } catch (err) {
-          res.status(500).send('服务器端错误!', err.message)
-        }
-      }
-    } catch (err) {
-      res.status(500).send('服务器端错误!', err.message)
-    }
   } catch (err) {
     res.status(500).send('服务器端错误!', err.message)
+    return
+  }
+  try {
+    await tagService.removeTag(req.body.title)
+    // console.log('[删除标签成功！]')
+    var tagItem = req.body.tagName
+    var item = ''
+    for (var i = 0; i <= tagItem.length; i++) {
+      item = tagItem[i]
+      var params = [item, req.body.title]
+      if (params[0] !== undefined) {
+        try {
+          await tagService.addTag(params)
+        } catch (err) {
+          res.status(500).send('服务器端错误!', err.message)
+          return
+        }
+      }
+    }
+    try {
+      await articleService.updateArticleById(req.body)
+      // console.log('[更新文章成功！] ')
+    } catch (err) {
+      res.status(500).send('服务器端错误!', err.message)
+      return
+    }
+    res.status(200).send({
+      code: '0'
+    })
+  } catch (err) {
+    res.status(500).send('服务器端错误!', err.message)
+    return
   }
 })
 
@@ -176,6 +182,7 @@ router.get('/api/someArticles', async (req, res) => {
     })
   } catch (err) {
     res.status(500).send('服务器端错误!', err.message)
+    return
   }
 })
 
