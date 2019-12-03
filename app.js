@@ -6,9 +6,6 @@ var logger = require('morgan')
 const routes = require('./routes/api/index.js')
 // var log4js = require('../log/logger.js')
 
-// var indexRouter = require('./routes/index');
-// var usersRouter = require('./routes/users');
-
 var app = express()
 
 // view engine setup
@@ -21,9 +18,6 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-// app.use('/user', function(req, res) {
-//   console.log('test')
-// })
 routes(app)
 // log4js.use(app)
 
@@ -37,10 +31,19 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
-
   // render the error page
   res.status(err.status || 500)
   res.render('error')
+})
+
+// 打印内存
+console.log('neicun', process.memoryUsage())
+const v8 = require('v8')
+console.log(v8.getHeapSpaceStatistics())
+
+//防止服务器 崩溃的方式，用这种方式，用于处理在运行时我们没有发现的错误
+process.on('uncaughtException', function(err) {
+  console.log(err.stack) //把错误放在栈中
 })
 
 module.exports = app
