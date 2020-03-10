@@ -1,7 +1,7 @@
 # solerji-blog-nodejs
 
 ## 内容说明
-本项目为个人博客的后台部分（目前已不在使用，挂服务器的是egg.js版本），开发模块分为管理平台和博客展示页面两部分。前端页面代码地址为，https://github.com/solerji/blogPage-vue.js
+本项目为个人博客的后台部分（目前已不再使用，挂服务器的是egg.js版本），开发模块分为管理平台和博客展示页面两部分。前端页面代码地址为，https://github.com/solerji/blogPage-vue.js
 
 功能点：
 
